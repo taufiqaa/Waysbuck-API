@@ -10,6 +10,7 @@ type ToppingRepository interface {
 	FindToppings() ([]models.Topping, error)
 	GetTopping(ID int) (models.Topping, error)
 	CreateTopping(topping models.Topping) (models.Topping, error)
+	DeleteTopping(topping models.Topping) (models.Topping, error)
 }
 
 func RepositoryTopping(db *gorm.DB) *repository {
@@ -32,6 +33,12 @@ func (r *repository) GetTopping(ID int) (models.Topping, error) {
 
 func (r *repository) CreateTopping(topping models.Topping) (models.Topping, error) {
 	err := r.db.Create(&topping).Error
+
+	return topping, err
+}
+
+func (r *repository) DeleteTopping(topping models.Topping) (models.Topping, error) {
+	err := r.db.Delete(&topping).Error
 
 	return topping, err
 }

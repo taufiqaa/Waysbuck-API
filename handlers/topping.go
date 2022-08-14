@@ -122,6 +122,31 @@ func (h *handlerTopping) CreateTopping(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+func (h *handlerTopping) DeleteTopping(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	topping, err := h.ToppingRepository.GetTopping(id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	data, err := h.ToppingRepository.DeleteTopping(topping)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	response := dto.SuccessResult{Status: "success", Data: data}
+	json.NewEncoder(w).Encode(response)
+}
+
 func convertResponseTopping(u models.Topping) models.ToppingResponse {
 	return models.ToppingResponse{
 		Title: u.Title,

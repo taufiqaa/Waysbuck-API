@@ -10,10 +10,11 @@ import (
 )
 
 func ToppingRoutes(r *mux.Router) {
-	productRepository := repositories.RepositoryProduct(mysql.DB)
-	h := handlers.HandlerProduct(productRepository)
+	toppingRepository := repositories.RepositoryTopping(mysql.DB)
+	h := handlers.HandlerTopping(toppingRepository)
 
-	r.HandleFunc("/toppings", middleware.Auth(h.FindProducts)).Methods("GET")
-	r.HandleFunc("/topping/{id}", middleware.Auth(h.GetProduct)).Methods("GET")
-	r.HandleFunc("/topping", middleware.Auth(middleware.UploadFile(h.CreateProduct))).Methods("POST")
+	r.HandleFunc("/toppings", middleware.Auth(h.FindToppings)).Methods("GET")
+	r.HandleFunc("/topping/{id}", middleware.Auth(h.GetTopping)).Methods("GET")
+	r.HandleFunc("/topping", middleware.Auth(middleware.UploadFile(h.CreateTopping))).Methods("POST")
+	r.HandleFunc("/topping/{id}", middleware.Auth(h.DeleteTopping)).Methods("DELETE")
 }
