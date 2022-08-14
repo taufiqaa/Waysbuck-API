@@ -7,7 +7,7 @@ type User struct {
 	Name      string                `json:"name" gorm:"type: varchar(255)"`
 	Email     string                `json:"email" gorm:"type: varchar(255)"`
 	Password  string                `json:"-" gorm:"type: varchar(255)"`
-	Profile   ProfileResponse       `json:"profile"`
+	Profile   ProfileResponse       `json:"-"`
 	Products  []ProductUserResponse `json: "products"`
 	CreatedAt time.Time             `json:"-"`
 	UpdatedAt time.Time             `json:"-"`

@@ -8,6 +8,7 @@ import (
 	"time"
 	authdto "waysbuck-API/dto/auth"
 	dto "waysbuck-API/dto/result"
+	usersdto "waysbuck-API/dto/users"
 	"waysbuck-API/models"
 	"waysbuck-API/pkg/bcrypt"
 	jwtToken "waysbuck-API/pkg/jwt"
@@ -80,8 +81,13 @@ func (h *handlerAuth) Register(w http.ResponseWriter, r *http.Request) {
 	// 	Token: token,
 	// }
 
+	// registerResponse := authdto.RegisterResponse{
+	// 	Name:  user.Name,
+	// 	Token: token,
+	// }
+
 	w.WriteHeader(http.StatusOK)
-	response := dto.SuccessResult{Status: "success", Data: convertResponse(data)}
+	response := dto.SuccessResult{Status: "success", Data: RegisResponse(data)}
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -141,4 +147,13 @@ func (h *handlerAuth) Login(w http.ResponseWriter, r *http.Request) {
 	response := dto.SuccessResult{Status: "success", Data: loginResponse}
 	json.NewEncoder(w).Encode(response)
 
+}
+
+func RegisResponse(u models.User) usersdto.RegisterResponse {
+	return usersdto.RegisterResponse{
+		// ID: u.ID,
+		Name: u.Name,
+		// Token: token,
+		// Password: u.Password,
+	}
 }
