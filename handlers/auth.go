@@ -66,20 +66,20 @@ func (h *handlerAuth) Register(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	}
 
-	// claims := jwt.MapClaims{}
-	// claims["id"] = user.ID
-	// claims["exp"] = time.Now().Add(time.Hour * 2).Unix() // 2 hours expired
+	claims := jwt.MapClaims{}
+	claims["id"] = data.ID
+	claims["exp"] = time.Now().Add(time.Hour * 2).Unix() // 2 hours expired
 
-	// token, errGenerateToken := jwtToken.GenerateToken(&claims)
-	// if errGenerateToken != nil {
-	// 	log.Println(errGenerateToken)
-	// 	fmt.Println("Unauthorize")
-	// 	return
-	// }
-	// registerResponse := authdto.RegisterResponse{
-	// 	Name:  user.Name,
-	// 	Token: token,
-	// }
+	token, errGenerateToken := jwtToken.GenerateToken(&claims)
+	if errGenerateToken != nil {
+		log.Println(errGenerateToken)
+		fmt.Println("Unauthorize")
+		return
+	}
+	registerResponse := authdto.RegisterResponse{
+		Name:  user.Name,
+		Token: token,
+	}
 
 	// registerResponse := authdto.RegisterResponse{
 	// 	Name:  user.Name,
@@ -87,7 +87,7 @@ func (h *handlerAuth) Register(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	w.WriteHeader(http.StatusOK)
-	response := dto.SuccessResult{Status: "success", Data: RegisResponse(data)}
+	response := dto.SuccessResult{Status: "success", Data: registerResponse}
 	json.NewEncoder(w).Encode(response)
 }
 
