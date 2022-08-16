@@ -149,7 +149,7 @@ func (h *handlerTopping) UpdateTopping(w http.ResponseWriter, r *http.Request) {
 
 	topping.Title = request.Title
 	topping.Price = request.Price
-	topping.Qty = request.Qty
+	// topping.Qty = request.Qty
 
 	if filename != "false" {
 		topping.Image = filename
