@@ -36,9 +36,9 @@ type ToppingUserResponse struct {
 }
 
 func (ToppingResponse) TableName() string {
-	return "products"
+	return "toppings"
 }
 
 func (ToppingUserResponse) TableName() string {
-	return "products"
+	return "toppings"
 }

@@ -19,7 +19,7 @@ type handlerProduct struct {
 }
 
 // Create `path_file` Global variable here ...
-var product_path_file = "http://localhost:2500/uploads/"
+var product_path_file = "http://localhost:5000/uploads/"
 
 func HandlerProduct(ProductRepository repositories.ProductRepository) *handlerProduct {
 	return &handlerProduct{ProductRepository}
@@ -125,24 +125,41 @@ func (h *handlerProduct) CreateProduct(w http.ResponseWriter, r *http.Request) {
 func (h *handlerProduct) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	request := new(productdto.UpdateProductRequest)
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
-	product, err := h.ProductRepository.GetProduct(int(id))
+
+	dataContex := r.Context().Value("dataFile")
+	filename := dataContex.(string)
+
+	price, _ := strconv.Atoi(r.FormValue("price"))
+	qty, _ := strconv.Atoi(r.FormValue("qty"))
+
+	request := productdto.ProductRequest{
+		Title: r.FormValue("title"),
+		Price: price,
+		Qty:   qty,
+	}
+
+	validation := validator.New()
+	err := validation.Struct(request)
+
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
 		json.NewEncoder(w).Encode(response)
 		return
 	}
 
-	data, err := h.ProductRepository.UpdateProduct(product)
+	product, _ := h.ProductRepository.GetProduct(id)
+
+	product.Title = request.Title
+	product.Price = request.Price
+	product.Qty = request.Qty
+
+	if filename != "false" {
+		product.Image = filename
+	}
+
+	product, err = h.ProductRepository.UpdateProduct(product)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
@@ -151,7 +168,7 @@ func (h *handlerProduct) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	response := dto.SuccessResult{Status: "success", Data: data}
+	response := dto.SuccessResult{Status: "success", Data: product}
 	json.NewEncoder(w).Encode(response)
 }
 
