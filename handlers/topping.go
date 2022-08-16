@@ -18,7 +18,7 @@ type handlerTopping struct {
 }
 
 // Create `path_file` Global variable here ...
-var topping_path_file = "http://localhost:2500/uploads/toppings"
+var topping_path_file = "http://localhost:5000/uploads/"
 
 func HandlerTopping(ToppingRepository repositories.ToppingRepository) *handlerTopping {
 	return &handlerTopping{ToppingRepository}
@@ -112,6 +112,56 @@ func (h *handlerTopping) CreateTopping(w http.ResponseWriter, r *http.Request) {
 	}
 
 	topping, _ = h.ToppingRepository.GetTopping(topping.ID)
+
+	w.WriteHeader(http.StatusOK)
+	response := dto.SuccessResult{Status: "success", Data: topping}
+	json.NewEncoder(w).Encode(response)
+}
+
+func (h *handlerTopping) UpdateTopping(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	dataContex := r.Context().Value("dataFile")
+	filename := dataContex.(string)
+
+	price, _ := strconv.Atoi(r.FormValue("price"))
+	qty, _ := strconv.Atoi(r.FormValue("qty"))
+
+	request := toppingdto.ToppingRequest{
+		Title: r.FormValue("title"),
+		Price: price,
+		Qty:   qty,
+	}
+
+	validation := validator.New()
+	err := validation.Struct(request)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	topping, _ := h.ToppingRepository.GetTopping(id)
+
+	topping.Title = request.Title
+	topping.Price = request.Price
+	topping.Qty = request.Qty
+
+	if filename != "false" {
+		topping.Image = filename
+	}
+
+	topping, err = h.ToppingRepository.UpdateTopping(topping)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Status: "success", Data: topping}

@@ -14,8 +14,13 @@ func UploadFile(next http.HandlerFunc) http.HandlerFunc {
 		// FormFile returns the first file for the given key `myFile`
 		// it also returns the FileHeader so we can get the Filename,
 		// the Header and the size of the file
-		file, dataFile, err := r.FormFile("image")
-		fmt.Println(dataFile.Filename)
+		file, _, err := r.FormFile("image")
+
+		if err != nil && r.Method == "PATCH" {
+			ctx := context.WithValue(r.Context(), "dataFile", "false")
+			next.ServeHTTP(w, r.WithContext(ctx))
+			return
+		}
 
 		if err != nil {
 			fmt.Println(err)
