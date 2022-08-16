@@ -10,7 +10,6 @@ import (
 	"waysbuck-API/repositories"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
 )
 
@@ -72,9 +71,6 @@ func (h *handlerTopping) CreateTopping(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// get data user token
-	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
-	userId := int(userInfo["id"].(float64))
-
 	// Get dataFile from midleware and store to filename variable here ...
 	dataContex := r.Context().Value("dataFile") // add this code
 	filename := dataContex.(string)             // add this code
@@ -99,11 +95,11 @@ func (h *handlerTopping) CreateTopping(w http.ResponseWriter, r *http.Request) {
 	}
 
 	topping := models.Topping{
-		Title:  request.Title,
-		Price:  request.Price,
-		Image:  filename,
-		Qty:    request.Qty,
-		UserID: userId,
+		Title: request.Title,
+		Price: request.Price,
+		Image: filename,
+		// Qty:    request.Qty,
+		// UserID: userId,
 	}
 
 	// err := mysql.DB.Create(&product).Error

@@ -24,6 +24,6 @@ func main() {
 
 	r.PathPrefix("/uploads").Handler(http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
 
-	fmt.Println("New Server is running on localhost:5000")
-	http.ListenAndServe("localhost:5000", r)
+	fmt.Println("New Server is running on localhost:2500")
+	http.ListenAndServe("localhost:2500", r)
 }
